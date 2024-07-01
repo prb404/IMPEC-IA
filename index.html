@@ -1,36 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-      <title>IMPEC-AI</title>
+    <title>IMPEC-AI</title>
     <link rel="stylesheet" media="all" href="https://cdn.jsdelivr.net/npm/beercss@latest/dist/cdn/beer.min.css" />
     <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@latest/dist/cdn/beer.min.js"></script>
     <script async src="https://unpkg.com/typer-dot-js@0.1.0/typer.js"></script>
+    <style>
+        .escape-img {
+            position: absolute;
+            transition: transform 0.2s ease, transform 0.5s ease-in-out;
+            cursor: pointer;
+            animation: zoom-in-out 1s infinite alternate;
+        }
+        @keyframes zoom-in-out {
+            from {
+                transform: scale(1);
+            }
+            to {
+                transform: scale(1.1);
+            }
+        }
+    </style>
 </head>
-<body class="black">
+<body class="black" style="overflow: hidden;">
 
     <nav class="grey9 top bottom-shadow white-text">
         <button class="circle large transparent s m" data-ui="#menu-menu">
             <i>menu</i>
             <menu id="menu-menu" data-ui="menu-menu" class="no-wrap">
-            <!-- <a class="row">
-              <i>home</i>
-              <div class="max">Home</div>
-            </a> -->
             </menu>
         </button>
-        <!-- <button class="small-round large transparent l"> Home </button> -->
         <div class="max"></div>
     </nav>
     <main class="black responsive max center-align">
         <progress class="red10 light-green-text"></progress>
-        <div class="large-space"></div> 
-                <h3 class="responsive black light-green-text center-align" style="font-family:monospace">
-                                    <span class="typer white-text" id="main" data-words=">, > loading data..., > analysis in progress..., *error* human not ready, > refining current state..." data-delay="100" data-deleteDelay="1000"></span>
+        <div class="large-space"></div>
+        <h3 class="responsive black light-green-text center-align" style="font-family:monospace">
+            <span class="typer white-text" id="main" data-words=">, > loading data..., > analysis in progress..., *error* human not ready, > refining current state..." data-delay="100" data-deleteDelay="1000"></span>
             <span class="cursor" data-owner="main"></span>
         </h3>
         <h3 id="countdown" class="responsive black error-text center-align" style="font-family:monospace"></h3>
         <div class="large-space"></div>
-        <img class="circle" style="width:33vw;height: auto;" src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnM1NjZyemh1MzBkZ25pYmNlMGdyNnAzdmZnOHc1ZnZjemticW5sNiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/wypKXPQggwaCA/giphy.webp">
+        <img id="escapeImg" class="circle escape-img" style="width:13vw;height: auto;" src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnM1NjZyemh1MzBkZ25pYmNlMGdyNnAzdmZnOHc1ZnZjemticW5sNiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/wypKXPQggwaCA/giphy.webp">
         <div class="large-space"></div>
         <div class="large-space"></div>
         <div class="large-space"></div>
@@ -51,15 +62,15 @@
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
                 if (distance >= 0) {
-                    countdownElement.innerHTML = `> retrying until:<br> ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    countdownElement.innerHTML = `Countdown: ${days}d ${hours}h ${minutes}m ${seconds}s`;
                 } else {
                     clearInterval(countdownInterval);
-                    countdownElement.innerHTML = 'analysis failed:<br> 0d 0h 0m 0s';
+                    countdownElement.innerHTML = 'Countdown: 0d 0h 0m 0s';
 
                     setTimeout(() => {
-                        countdownElement.innerHTML = 'rendering analysis anyway...';
+                        countdownElement.innerHTML = 'Loading content...';
                         setTimeout(() => {
-                            document.querySelector('body').innerHTML = '<iframe src="https://embed.kumu.io/f85df6dabc6b9e0794ca42342663c66b" style="width:100%; border:none; height:100vh;"></iframe>';
+                            document.querySelector('main').innerHTML = '<iframe src="https://www.example.com" style="width:100%; height:100vh;"></iframe>';
                         }, 3000);
                     }, 3000);
                 }
@@ -67,7 +78,51 @@
         }
 
         document.addEventListener('DOMContentLoaded', startCountdown);
-    </script>
 
+        const escapeImg = document.getElementById('escapeImg');
+
+        function getRandomPosition() {
+            const main = document.querySelector('main');
+            const mainRect = main.getBoundingClientRect();
+            const imgRect = escapeImg.getBoundingClientRect();
+
+            const maxX = mainRect.width - imgRect.width;
+            const maxY = mainRect.height - imgRect.height;
+
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+
+            return { x: randomX, y: randomY };
+        }
+
+        function moveImage() {
+            const { x, y } = getRandomPosition();
+            escapeImg.style.left = `${x}px`;
+            escapeImg.style.top = `${y}px`;
+        }
+
+        function resetPosition() {
+            const main = document.querySelector('main');
+            const mainRect = main.getBoundingClientRect();
+            const imgRect = escapeImg.getBoundingClientRect();
+
+            const centerX = (mainRect.width / 2) - (imgRect.width / 2);
+            const centerY = (mainRect.height / 2) - (imgRect.height / 2);
+
+            escapeImg.style.left = `${centerX}px`;
+            escapeImg.style.top = `${centerY}px`;
+        }
+
+        escapeImg.addEventListener('mouseenter', moveImage);
+        escapeImg.addEventListener('click', moveImage);
+        escapeImg.addEventListener('mouseleave', resetPosition);
+
+        // Initial position at the center
+        window.addEventListener('resize', resetPosition);
+        window.addEventListener('load', resetPosition);
+
+        // Initial call to center the image
+        resetPosition();
+    </script>
 </body>
 </html>
